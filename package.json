@@ -1,0 +1,23 @@
+{
+  "name": "checkegeedubot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "bot": "node src/index.js",
+    "docker:build": "docker build -t checkegeedubot .",
+    "docker:run": "docker run -d -v $(pwd)/storage:/bot/opt/storage -u $(id -u) -e TG_TOKEN --restart unless-stopped --name checkegeedubot checkegeedubot",
+    "docker:stop": "docker stop checkegeedubot && docker rm checkegeedubot",
+    "docker:logs": "docker logs checkegeedubot"
+  },
+  "dependencies": {
+    "js-yaml": "^3.13.1",
+    "lowdb": "^1.0.0",
+    "node-emoji": "^1.10.0",
+    "node-fetch": "^2.6.0",
+    "sqlite3": "^4.0.8",
+    "telegraf": "^3.30.1",
+    "telegraf-session-local": "^0.0.7",
+    "telegraf-session-sqlite": "^1.0.6"
+  }
+}
