@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const md5 = (data) => crypto.createHash('md5').update(data).digest('hex');
 
 const {Regions} = require('./../vendor');
+const {mainMenu} = require('./../utils');
 
 module.exports.addingWizard = new WizardScene('adding-wizard', {},
     new Composer(
