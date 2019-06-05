@@ -6,6 +6,7 @@ const Telegraf = require('telegraf');
 const Stage = require('telegraf/stage');
 const Markup = require('telegraf/markup');
 
+const uuid = require('uuid/v4');
 const sqlite3 = require('sqlite3').verbose();
 const session = require('telegraf-session-sqlite');
 const LocalSession = require('telegraf-session-local');
@@ -14,7 +15,7 @@ const {mainMenu} = require('./utils');
 const {addingWizard} = require('./wizards/adding');
 const {checkingWizard} = require('./wizards/checking');
 
-module.exports = class CheckBot extends Telegraf{
+module.exports = class CheckBot extends Telegraf {
     constructor() {
         super(...arguments);
 
@@ -78,17 +79,48 @@ module.exports = class CheckBot extends Telegraf{
         );
     }
 
+    launch(options) {
+        const domain = process.env.WEBHOOK_DOMAIN;
+        if (domain) {
+            this.telegram
+                .deleteWebhook()
+                .then(async () => {
+                    const secretPath = uuid();
+                    this.startWebhook(`/${secretPath}`, undefined, 5000);
+                    await this.telegram.setWebhook(
+                        `https://${domain}/${secretPath}`,
+                        undefined,
+                        100
+                    );
+                    const webhookInfo = await this.telegram.getWebhookInfo();
+                    console.info('Bot is up and running with webhooks', webhookInfo);
+                })
+                .catch(err => console.info('Bot launch error', err));
+        } else {
+            this.telegram
+                .deleteWebhook()
+                .then(async () => {
+                    this.startPolling();
+                    // Console that everything is fine
+                    console.info('Bot is up and running');
+                })
+                .catch(err => console.info('Bot launch error', err));
+        }
+    }
+
     stop(cb) {
         console.log('Stopping telegraf...');
         super.stop(() => {
             console.log('Telegraf stopped.');
 
-            console.log('Closing sqlite3...');
-            this.db.close(() => {
-                console.log('Sqlite3 closed.');
+            if (this.db) {
+                console.log('Closing sqlite3...');
+                this.db.close(() => {
+                    console.log('Sqlite3 closed.');
 
-                cb();
-            });
+                    cb();
+                });
+            } else cb();
         });
     }
 };
