@@ -7,10 +7,23 @@ const Composer = require('telegraf/composer');
 const WizardScene = require('telegraf/scenes/wizard');
 
 const fetch = require('node-fetch');
+const AbortController = require('abort-controller');
 const {URLSearchParams} = require('url');
 const yaml = require('js-yaml');
 
 const {mainMenu, formatExams} = require('./../utils');
+
+function reqTimeout(timeout) {
+    const controller = new AbortController();
+    return {
+        controller,
+        timeout: setTimeout(
+            () => controller.abort(),
+            timeout,
+        ),
+        param: {signal: controller.signal},
+    };
+}
 
 const refreshCaptcha = async (ctx) => {
     if (ctx.wizard.state.user.cookie)
@@ -19,7 +32,8 @@ const refreshCaptcha = async (ctx) => {
     delete ctx.wizard.state.token;
     delete ctx.wizard.state.captcha;
 
-    await fetch('http://check.ege.edu.ru/api/captcha')
+    const timeout = reqTimeout(5000);
+    await fetch('http://check.ege.edu.ru/api/captcha', timeout.param)
         .then((res) => res.json())
         .then((data) => {
             ctx.wizard.state.token = data.Token;
@@ -29,14 +43,23 @@ const refreshCaptcha = async (ctx) => {
                 Markup.callbackButton('Обновить', 'refresh'),
                 Markup.callbackButton('Отмена', 'cancel'),
             ]).extra());
-        });
+        }).catch((err) => {
+            if (err.name === 'AbortError')
+                ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
+                    Markup.inlineKeyboard([
+                        Markup.callbackButton('Повторить', 'refresh'),
+                        Markup.callbackButton('Отмена', 'cancel'),
+                    ]).extra())
+        }).finally(() => clearTimeout(timeout.timeout));
 };
 
 const checkExam = async (ctx) => {
     if (!ctx.wizard.state.user.cookie)
         return await refreshCaptcha(ctx);
 
+    const timeout = reqTimeout(5000);
     await fetch('http://check.ege.edu.ru/api/exam', {
+        ...timeout.param,
         headers: {
             cookie: ctx.wizard.state.user.cookie
         }
@@ -74,7 +97,14 @@ const checkExam = async (ctx) => {
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
 
             return await ctx.scene.leave();
-        });
+        }).catch((err) => {
+            if (err.name === 'AbortError')
+                ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
+                    Markup.inlineKeyboard([
+                        Markup.callbackButton('Повторить', 'check'),
+                        Markup.callbackButton('Отмена', 'cancel'),
+                    ]).extra())
+        }).finally(() => clearTimeout(timeout.timeout));
 };
 
 const login = async (ctx) => {
@@ -99,7 +129,9 @@ const login = async (ctx) => {
     delete ctx.wizard.state.captcha;
     delete ctx.wizard.state.token;
 
+    const timeout = reqTimeout(5000);
     await fetch('http://check.ege.edu.ru/api/participant/login', {
+        ...timeout.param,
         method: 'POST',
         body: params
     })
@@ -117,7 +149,14 @@ const login = async (ctx) => {
                     Markup.callbackButton('Отмена', 'cancel'),
                 ]).extra());
             }
-        })
+        }).catch((err) => {
+            if (err.name === 'AbortError')
+                ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
+                    Markup.inlineKeyboard([
+                        Markup.callbackButton('Повторить', 'login'),
+                        Markup.callbackButton('Отмена', 'cancel'),
+                    ]).extra())
+        }).finally(() => clearTimeout(timeout.timeout));
 };
 
 module.exports.checkingWizard = new WizardScene('checking-wizard', {},
@@ -130,7 +169,9 @@ module.exports.checkingWizard = new WizardScene('checking-wizard', {},
             }
             await checkExam(ctx);
         }),
+        Composer.action('check', checkExam),
         Composer.action('refresh', refreshCaptcha),
+        Composer.action('login', login),
         Composer.action('cancel', (ctx) => {
             ctx.reply('Выберите любую опцию', Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             return ctx.scene.leave();
