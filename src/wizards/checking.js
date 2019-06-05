@@ -57,6 +57,7 @@ const checkExam = async (ctx) => {
     if (!ctx.wizard.state.user.cookie)
         return await refreshCaptcha(ctx);
 
+    ctx.reply('Проверяем...');
     const timeout = reqTimeout(5000);
     await fetch('http://check.ege.edu.ru/api/exam', {
         ...timeout.param,
