@@ -11,6 +11,7 @@ const uuid = require('uuid/v4');
 const sqlite3 = require('sqlite3').verbose();
 const session = require('telegraf-session-sqlite');
 const LocalSession = require('telegraf-session-local');
+const RedisSession = require('telegraf-session-redis');
 
 const {mainMenu} = require('./utils');
 const {addingWizard} = require('./wizards/adding');
@@ -20,13 +21,13 @@ module.exports = class CheckBot extends Telegraf {
     constructor() {
         super(...arguments);
 
-        if (!fs.existsSync('storage')){
+        if (!fs.existsSync('storage')) {
             fs.mkdirSync('storage');
         }
 
         if (process.env.DB_TYPE === 'lowdb')
             this.use(new LocalSession({database: './storage/db.json'}).middleware());
-        else {
+        else if (process.env.DB_TYPE === 'sqlite') {
             this.db = new sqlite3.Database('./storage/db.sqlite3');
 
             this.db.serialize(() => {
@@ -38,6 +39,10 @@ module.exports = class CheckBot extends Telegraf {
                 db: this.db,
                 table_name: 'user_session'
             }));
+        } else {
+            // Heroku Redis Cloud addon
+            const redisUrl = process.env.REDISCLOUD_URL;
+            this.use(new RedisSession({store: {url: redisUrl}}));
         }
 
         this.mount()

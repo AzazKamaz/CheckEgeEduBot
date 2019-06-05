@@ -2,10 +2,17 @@
 # yarn lockfile v1
 
 
-"@types/node@^12.0.4":
+"@types/node@*", "@types/node@^12.0.4":
   version "12.0.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.4.tgz#46832183115c904410c275e34cf9403992999c32"
   integrity sha512-j8YL2C0fXq7IONwl/Ud5Kt0PeXw22zGERt+HSSnwbKOJVsAGkEz3sFCYwaF9IOuoG1HOtE0vKCj6sXF7Q0+Vaw==
+
+"@types/redis@^2.8.6":
+  version "2.8.13"
+  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.13.tgz#fdd76d9a8b7c36ff24d8506a94ef2a890c87f498"
+  integrity sha512-p86cm5P6DMotUqCS6odQRz0JJwc5QXZw9eyH0ALVIqmq12yqtex5ighWyGFHKxak9vaA/GF/Ilu0KZ0MuXXUbg==
+  dependencies:
+    "@types/node" "*"
 
 abbrev@1:
   version "1.1.1"
@@ -183,6 +190,11 @@ detect-libc@^1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
   integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
+
+double-ended-queue@^2.1.0-0:
+  version "2.1.0-0"
+  resolved "https://registry.yarnpkg.com/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
+  integrity sha1-ED01J/0xUo9AGIEwyEHv3XgmTlw=
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -678,6 +690,25 @@ readable-stream@^2.0.6:
     string_decoder "~1.1.1"
     util-deprecate "~1.0.1"
 
+redis-commands@^1.2.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/redis-commands/-/redis-commands-1.5.0.tgz#80d2e20698fe688f227127ff9e5164a7dd17e785"
+  integrity sha512-6KxamqpZ468MeQC3bkWmCB1fp56XL64D4Kf0zJSwDZbVLLm7KFkoIcHrgRvQ+sk8dnhySs7+yBg94yIkAK7aJg==
+
+redis-parser@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/redis-parser/-/redis-parser-2.6.0.tgz#52ed09dacac108f1a631c07e9b69941e7a19504b"
+  integrity sha1-Uu0J2srBCPGmMcB+m2mUHnoZUEs=
+
+redis@^2.6.0-1:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/redis/-/redis-2.8.0.tgz#202288e3f58c49f6079d97af7a10e1303ae14b02"
+  integrity sha512-M1OkonEQwtRmZv4tEWF2VgpG0JWJ8Fv1PhlgT5+B+uNq2cA3Rt1Yt/ryoR+vQNOQcIEgdCdfH0jr3bDpihAw1A==
+  dependencies:
+    double-ended-queue "^2.1.0-0"
+    redis-commands "^1.2.0"
+    redis-parser "^2.6.0"
+
 request@^2.87.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
@@ -846,6 +877,15 @@ telegraf-session-local@^0.0.7:
     debug "^4.1.1"
     lodash-id "^0.14.0"
     lowdb "^1.0.0"
+
+telegraf-session-redis@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/telegraf-session-redis/-/telegraf-session-redis-5.1.0.tgz#f0eb6ff4f433ba97c4ea6d7717c8886b5d347ddb"
+  integrity sha512-Ohl9GxorTz3kcgFL38KSYl7U4OqEr6TLNXa841pFC7wwB9Z/zhOt9nkExAFOWu5wHE8wBwApCHt5X63XGvhy3Q==
+  dependencies:
+    "@types/redis" "^2.8.6"
+    debug "^4.1.1"
+    redis "^2.6.0-1"
 
 telegraf-session-sqlite@^1.0.6:
   version "1.0.6"
