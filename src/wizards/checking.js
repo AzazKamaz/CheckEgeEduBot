@@ -75,6 +75,8 @@ const checkExam = async (ctx) => {
 
             if (data.Message === "Authorization has been denied for this request.") {
                 delete ctx.wizard.state.user.cookie;
+                delete (ctx.session.participants[ctx.wizard.state.user.id] || {}).cookie;
+
                 if (ctx.session.raw)
                     ctx.replyWithMarkdown(
                         header + '```\n' + yaml.safeDump(data) + '\n```',
@@ -140,7 +142,8 @@ const login = async (ctx) => {
             let text = await res.text();
             if (res.ok) {
                 let headers = res.headers.get('set-cookie');
-                ctx.wizard.state.user.cookie = headers.replace(/(^\s*|^.*;\s*)(Participant=[^\s;]+)(\s|;).*$/g, '$2');
+                (ctx.session.participants[ctx.wizard.state.user.id] || {}).cookie =
+                    ctx.wizard.state.user.cookie = headers.replace(/(^\s*|^.*;\s*)(Participant=[^\s;]+)(\s|;).*$/g, '$2');
                 await checkExam(ctx);
             } else if (text.trim() === '"Пожалуйста, проверьте правильность введённого кода с картинки"') {
                 return await refreshCaptcha(ctx);
