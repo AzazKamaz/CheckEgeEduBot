@@ -92,13 +92,13 @@ module.exports.addingWizard = new WizardScene('adding-wizard', {},
             let user = {
                 ...ctx.wizard.state,
                 data: {
-                    Hash: md5(utf8(
+                    Hash: md5(
                         ctx.wizard.state.name
                             .toLowerCase()
                             .replace(/[^a-zA-Zа-яА-ЯЁё]+/g, '')
                             .replace(/ё/g, 'е')
                             .replace(/й/g, 'и')
-                    )),
+                    ),
                     Code: ctx.wizard.state.type === 'code' ? ctx.wizard.state.value : null,
                     Document: ctx.wizard.state.type === 'document' ? ctx.wizard.state.value : null,
                     Region: ctx.wizard.state.region,
