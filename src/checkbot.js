@@ -6,6 +6,7 @@ const Telegraf = require('telegraf');
 const Stage = require('telegraf/stage');
 const Markup = require('telegraf/markup');
 
+const fs = require('fs');
 const uuid = require('uuid/v4');
 const sqlite3 = require('sqlite3').verbose();
 const session = require('telegraf-session-sqlite');
@@ -18,6 +19,10 @@ const {checkingWizard} = require('./wizards/checking');
 module.exports = class CheckBot extends Telegraf {
     constructor() {
         super(...arguments);
+
+        if (!fs.existsSync('storage')){
+            fs.mkdirSync('storage');
+        }
 
         if (process.env.DB_TYPE === 'lowdb')
             this.use(new LocalSession({database: './storage/db.json'}).middleware());
