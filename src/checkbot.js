@@ -98,7 +98,7 @@ module.exports = class CheckBot extends Telegraf {
             this.telegram
                 .deleteWebhook()
                 .then(async () => {
-                    const secretPath = uuid();
+                    const secretPath = process.env.WEBHOOK_PATH || uuid();
                     this.startWebhook(`/${secretPath}`, undefined, port);
                     await this.telegram.setWebhook(
                         `https://${domain}/${secretPath}`,
