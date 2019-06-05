@@ -94,7 +94,7 @@ const checkExam = async (ctx) => {
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             else
                 ctx.replyWithMarkdown(header + formatExams(data.Result.Exams)
-                    + '\n\n* Ссылка заработает после входа на http://check.ege.edu.ru',
+                    + '\n\n\\* Ссылка заработает после входа на http://check.ege.edu.ru',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
 
             return await ctx.scene.leave();
