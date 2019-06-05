@@ -41,6 +41,9 @@ module.exports = class CheckBot extends Telegraf{
         const stage = new Stage([addingWizard, checkingWizard]);
         this.use(stage.middleware());
 
+        // Any input in "forms" (like name, document number and region) are processed above, in stage.
+        // So this middleware will print only /start command and text out of system
+        // This is a some kind of analytics, don't worry about it :)
         this.use((ctx, next) => {
             if (ctx.update && ctx.update.message)
                 console.log(`@${ctx.update.message.from.username}: ${ctx.update.message.text}`);
