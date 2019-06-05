@@ -6,7 +6,7 @@
   "scripts": {
     "bot": "node src/index.js",
     "docker:build": "docker build -t checkegeedubot .",
-    "docker:run": "docker run -d -v $(pwd)/storage:/bot/opt/storage -u $(id -u) -e TG_TOKEN --restart unless-stopped --name checkegeedubot checkegeedubot",
+    "docker:run": "docker run -d -v $(pwd)/storage:/opt/bot/storage -u $(id -u) -e TG_TOKEN --restart unless-stopped --name checkegeedubot checkegeedubot",
     "docker:stop": "docker stop checkegeedubot && docker rm checkegeedubot",
     "docker:logs": "docker logs checkegeedubot"
   },
