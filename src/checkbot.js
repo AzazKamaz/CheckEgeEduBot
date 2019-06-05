@@ -25,10 +25,11 @@ module.exports = class CheckBot extends Telegraf {
             fs.mkdirSync('storage');
         }
 
+        const file = process.env.DB_FILE;
         if (process.env.DB_TYPE === 'lowdb')
-            this.use(new LocalSession({database: './storage/db.json'}).middleware());
+            this.use(new LocalSession({database: file || './storage/db.json'}).middleware());
         else if (process.env.DB_TYPE === 'sqlite') {
-            this.db = new sqlite3.Database('./storage/db.sqlite3');
+            this.db = new sqlite3.Database(file || './storage/db.sqlite3');
 
             this.db.serialize(() => {
                 this.db.run('CREATE TABLE IF NOT EXISTS user_session' +
@@ -39,11 +40,12 @@ module.exports = class CheckBot extends Telegraf {
                 db: this.db,
                 table_name: 'user_session'
             }));
-        } else {
+        } else if (process.env.DB_TYPE === 'redis') {
             // Heroku Redis Cloud addon
             const redisUrl = process.env.REDISCLOUD_URL;
             this.use(new RedisSession({store: {url: redisUrl}}));
-        }
+        } else
+            this.use(new LocalSession().middleware());
 
         this.mount()
     }
