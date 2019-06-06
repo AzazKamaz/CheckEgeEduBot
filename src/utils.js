@@ -45,7 +45,7 @@ function formatExam(exam) {
         exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
         exam.minMark ? `Минимальный балл: \`${exam.minMark}\`` : null,
         `Статус: \`${exam.status}\``,
-        exam.result ? `*Проверьте: ${exam.result}` : null,
+        exam.result ? `\\*Проверьте: ${exam.result}` : null,
     ].filter((s) => s !== null).join('\n');
 }
 
