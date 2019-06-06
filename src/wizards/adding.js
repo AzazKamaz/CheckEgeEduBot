@@ -51,7 +51,7 @@ module.exports.addingWizard = new WizardScene('adding-wizard', {},
         Composer.mount('text', (ctx) => {
             let text = ctx.message.text.replace(/[^\d]/g, '');
             if (text.length) {
-                ctx.wizard.state.value = text.padStart(12, '0');
+                ctx.wizard.state.value = text;
                 ctx.replyWithMarkdown('Введите номер региона\n' +
                     '`90` - ОУ, находящиеся за пределами РФ');
                 return ctx.wizard.next();
@@ -100,8 +100,8 @@ module.exports.addingWizard = new WizardScene('adding-wizard', {},
                             .replace(/ё/g, 'е')
                             .replace(/й/g, 'и')
                     ),
-                    Code: ctx.wizard.state.type === 'code' ? ctx.wizard.state.value : null,
-                    Document: ctx.wizard.state.type === 'document' ? ctx.wizard.state.value : null,
+                    Code: ctx.wizard.state.type === 'code' ? ctx.wizard.state.value.padStart(12, '0') : null,
+                    Document: ctx.wizard.state.type === 'document' ? ctx.wizard.state.value.padStart(12, '0') : null,
                     Region: ctx.wizard.state.region,
                 },
                 id: +Date.now()
