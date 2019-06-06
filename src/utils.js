@@ -22,6 +22,18 @@ module.exports.mainMenu = function (session, participants = session.participants
     ];
 };
 
+module.exports.reqTimeout = function(timeout) {
+    const controller = new AbortController();
+    return {
+        controller,
+        timeout: setTimeout(
+            () => controller.abort(),
+            timeout,
+        ),
+        param: {signal: controller.signal},
+    };
+};
+
 const mapExam = (exam) => ({
     id: exam.ExamId,
     date: DateUtils.dateToRuFormat(exam.ExamDate),

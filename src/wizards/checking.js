@@ -11,19 +11,7 @@ const AbortController = require('abort-controller');
 const {URLSearchParams} = require('url');
 const yaml = require('js-yaml');
 
-const {mainMenu, formatExams} = require('./../utils');
-
-function reqTimeout(timeout) {
-    const controller = new AbortController();
-    return {
-        controller,
-        timeout: setTimeout(
-            () => controller.abort(),
-            timeout,
-        ),
-        param: {signal: controller.signal},
-    };
-}
+const {mainMenu, formatExams, reqTimeout} = require('./../utils');
 
 const refreshCaptcha = async (ctx) => {
     if (ctx.wizard.state.user.cookie)
