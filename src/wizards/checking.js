@@ -7,7 +7,6 @@ const Composer = require('telegraf/composer');
 const WizardScene = require('telegraf/scenes/wizard');
 
 const fetch = require('node-fetch');
-const AbortController = require('abort-controller');
 const {URLSearchParams} = require('url');
 const yaml = require('js-yaml');
 

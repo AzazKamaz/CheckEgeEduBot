@@ -4,6 +4,7 @@
 
 const Markup = require('telegraf/markup');
 const emoji = require('node-emoji');
+const AbortController = require('abort-controller');
 
 const {DateUtils, Appeal} = require('./vendor');
 
