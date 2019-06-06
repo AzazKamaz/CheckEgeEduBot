@@ -97,7 +97,6 @@ const checkExam = async (ctx) => {
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             else {
                 const timeout = reqTimeout(5000);
-                console.log(ctx.wizard.state.user.hasResults);
                 ctx.wizard.state.user.hasResults = await Promise.all(data.Result.Exams
                     .map((exam) => (ctx.wizard.state.user.hasResults || {})[exam.ExamId]
                         ? exam.ExamId : fetch(`http://check.ege.edu.ru/api/exam/${exam.ExamId}`, {
@@ -108,7 +107,6 @@ const checkExam = async (ctx) => {
                         }).then(({ok}) => ok ? exam.ExamId : null).catch(() => null)))
                     .then((has) => has.reduce((has, id) => id !== null ? {...has, [id]: true} : has, {}))
                     .finally(() => clearTimeout(timeout.timeout));
-                console.log(ctx.wizard.state.user.hasResults);
 
                 ctx.replyWithMarkdown(header
                     + formatExams(data.Result.Exams.map((exam) => ({
