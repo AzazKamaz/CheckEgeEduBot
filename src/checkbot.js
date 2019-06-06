@@ -104,7 +104,7 @@ module.exports = class CheckBot extends Telegraf {
 
     launch(options) {
         const domain = process.env.WEBHOOK_DOMAIN;
-        const port = process.env.PORT;
+        const port = process.env.PORT || 8000;
         if (domain) {
             this.telegram
                 .deleteWebhook()
