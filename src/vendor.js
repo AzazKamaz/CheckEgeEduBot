@@ -355,6 +355,70 @@ module.exports.Regions = [{
     };
 }, {});
 
+module.exports.Appeal = [{
+    "Status": 0,
+    "Description": "Сформировано заявление участником"
+}, {
+    "Status": 1,
+    "Description": "Сформировано заявление оператором"
+}, {
+    "Status": 2,
+    "Description": "Отменена участником"
+}, {
+    "Status": 3,
+    "Description": "Отменена оператором"
+}, {
+    "Status": 4,
+    "Description": "Апелляция открыта участником заново"
+}, {
+    "Status": 5,
+    "Description": "Апелляция открыта оператором заново"
+}, {
+    "Status": 10,
+    "Description": "Сформировано заявление в РЦОИ"
+}, {
+    "Status": 11,
+    "Description": "Распечатаны бланки"
+}, {
+    "Status": 12,
+    "Description": "Введены данные"
+}, {
+    "Status": 20,
+    "Description": "На обработке"
+}, {
+    "Status": 30,
+    "Description": "Ожидание подтверждения"
+}, {
+    "Status": 32,
+    "Description": "Введено подтверждение"
+}, {
+    "Status": 40,
+    "Description": "Подтверждение на обработке"
+}, {
+    "Status": 52,
+    "Description": "Создано блокирование"
+}, {
+    "Status": 60,
+    "Description": "Блокирование на обработке"
+}, {
+    "Status": 100,
+    "Description": "Удовлетворена"
+}, {
+    "Status": 101,
+    "Description": "Отклонена конфликтной комиссией субъекта РФ"
+}, {
+    "Status": 103,
+    "Description": "Заблокирована"
+}, {
+    "Status": 1000,
+    "Description": "Задержана"
+}].reduce(function (map, obj) {
+    return {
+        ...map,
+        [obj.Status]: obj.Description
+    };
+}, {});
+
 module.exports.cond = {
     basicMath: {
         minMark: 3

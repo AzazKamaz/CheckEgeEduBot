@@ -5,7 +5,7 @@
 const Markup = require('telegraf/markup');
 const emoji = require('node-emoji');
 
-const {DateUtils} = require('./vendor');
+const {DateUtils, Appeal} = require('./vendor');
 
 module.exports.mainMenu = function (session, participants = session.participants) {
     return [...
@@ -22,7 +22,7 @@ module.exports.mainMenu = function (session, participants = session.participants
     ];
 };
 
-module.exports.reqTimeout = function(timeout) {
+module.exports.reqTimeout = function (timeout) {
     const controller = new AbortController();
     return {
         controller,
@@ -47,8 +47,13 @@ const mapExam = (exam) => ({
             ? (exam.Mark5 === 5 ? '«Зачёт»' : 'Нет результата со значением «зачёт»')
             : (exam.IsHidden ? 'Результат скрыт' : 'Экзамен обработан'))
         : 'Нет результата',
+    ...(!exam.HasAppeal ? {}
+        : {
+            appeal: Appeal[exam.AppealStatus],
+            appealLink: `http://check.ege.edu.ru/appeal/${exam.ExamId}`
+        }),
     ...(!exam._HasResult ? {}
-        : {result: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
+        : {resultLink: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
 });
 
 function formatExam(exam) {
@@ -57,7 +62,9 @@ function formatExam(exam) {
         exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
         exam.minMark ? `Минимальный балл: \`${exam.minMark}\`` : null,
         `Статус: \`${exam.status}\``,
-        exam.result ? `\\*Проверьте: ${exam.result}` : null,
+        exam.resultLink ? `\\*Проверьте: ${exam.resultLink}` : null,
+        exam.appeal ? `Апелляция: \`${exam.appeal}\`` : null,
+        exam.appealLink ? `\\*Апелляция: ${exam.appealLink}` : null,
     ].filter((s) => s !== null).join('\n');
 }
 
