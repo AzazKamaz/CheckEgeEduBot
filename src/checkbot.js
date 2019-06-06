@@ -44,8 +44,19 @@ module.exports = class CheckBot extends Telegraf {
             // Heroku Redis Cloud addon
             const redisUrl = process.env.REDISCLOUD_URL;
             this.use(new RedisSession({store: {url: redisUrl}}));
-        } else
-            this.use(new LocalSession().middleware());
+        } else {
+            this.db = new sqlite3.Database(':memory:');
+
+            this.db.serialize(() => {
+                this.db.run('CREATE TABLE IF NOT EXISTS user_session' +
+                    '(id TEXT primary key, session TEXT);');
+            });
+
+            this.use(session({
+                db: this.db,
+                table_name: 'user_session'
+            }));
+        }
 
         this.mount()
     }
