@@ -95,10 +95,29 @@ const checkExam = async (ctx) => {
                 ctx.replyWithMarkdown(
                     header + '```\n' + yaml.safeDump(data) + '\n```',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
-            else
-                ctx.replyWithMarkdown(header + formatExams(data.Result.Exams)
+            else {
+                const timeout = reqTimeout(5000);
+                console.log(ctx.wizard.state.user.hasResults);
+                ctx.wizard.state.user.hasResults = await Promise.all(data.Result.Exams
+                    .map((exam) => (ctx.wizard.state.user.hasResults || {})[exam.ExamId]
+                        ? exam.ExamId : fetch(`http://check.ege.edu.ru/api/exam/${exam.ExamId}`, {
+                            ...timeout.param,
+                            headers: {
+                                cookie: ctx.wizard.state.user.cookie
+                            }
+                        }).then(({ok}) => ok ? exam.ExamId : null).catch(() => null)))
+                    .then((has) => has.reduce((has, id) => id !== null ? {...has, [id]: true} : has, {}))
+                    .finally(() => clearTimeout(timeout.timeout));
+                console.log(ctx.wizard.state.user.hasResults);
+
+                ctx.replyWithMarkdown(header
+                    + formatExams(data.Result.Exams.map((exam) => ({
+                        ...exam,
+                        _HasResult: ctx.wizard.state.user.hasResults[exam.ExamId]
+                    })))
                     + '\n\n\\* Результаты откроются после входа на http://check.ege.edu.ru',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
+            }
 
             return await ctx.scene.leave();
         }).catch((err) => {
@@ -143,8 +162,8 @@ const login = async (ctx) => {
             let text = await res.text();
             if (res.ok) {
                 let headers = res.headers.get('set-cookie');
-                (ctx.session.participants[ctx.wizard.state.user.id] || {}).cookie =
-                    ctx.wizard.state.user.cookie = headers.replace(/(^\s*|^.*;\s*)(Participant=[^\s;]+)(\s|;).*$/g, '$2');
+                ctx.wizard.state.user.cookie = headers.replace(/(^\s*|^.*;\s*)(Participant=[^\s;]+)(\s|;).*$/g, '$2');
+                ctx.session.participants[ctx.wizard.state.user.id] = ctx.wizard.state.user;
                 await checkExam(ctx);
             } else if (text.trim() === '"Пожалуйста, проверьте правильность введённого кода с картинки"') {
                 return await refreshCaptcha(ctx);

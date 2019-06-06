@@ -35,7 +35,8 @@ const mapExam = (exam) => ({
             ? (exam.Mark5 === 5 ? '«Зачёт»' : 'Нет результата со значением «зачёт»')
             : (exam.IsHidden ? 'Результат скрыт' : 'Экзамен обработан'))
         : 'Нет результата',
-    result: `http://check.ege.edu.ru/exams/${exam.ExamId}`,
+    ...(!exam._HasResult ? {}
+        : {result: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
 });
 
 function formatExam(exam) {
