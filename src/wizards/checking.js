@@ -111,7 +111,7 @@ const checkExam = async (ctx) => {
                 ctx.replyWithMarkdown(header
                     + formatExams(data.Result.Exams.map((exam) => ({
                         ...exam,
-                        _HasResult: (ctx.wizard.state.user.hasResults | {})[exam.ExamId]
+                        _HasResult: true //(ctx.wizard.state.user.hasResults | {})[exam.ExamId]
                     })))
                     + '\n\n\\* Результаты откроются после входа на http://check.ege.edu.ru',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
