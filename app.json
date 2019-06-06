@@ -1,0 +1,7 @@
+{
+  "name": "CheckEgeEduBot",
+  "description": "Telegram bot for checking check.ege.edu.ru",
+  "repository": "https://github.com/AzazKamaz/CheckEgeEduBot",
+  "logo": "https://github.com/AzazKamaz/CheckEgeEduBot/raw/master/logo.png",
+  "keywords": [ "node", "telegram", "bot", "telegraf", "redis", "sqlite3" ]
+}
