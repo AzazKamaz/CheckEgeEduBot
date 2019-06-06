@@ -22,42 +22,34 @@ module.exports.mainMenu = function (session, participants = session.participants
     ];
 };
 
-function formatObject(obj) {
-    const locale = {
-        date: 'Дата экзамена',
-        subject: 'Предмет',
-        testMark: 'Тестовый балл',
-        minMark: 'Минимальный балл',
-        status: 'Статус экзамена',
-        result: 'Результат',
-    };
+const mapExam = (exam) => ({
+    id: exam.ExamId,
+    date: DateUtils.dateToRuFormat(exam.ExamDate),
+    subject: exam.OralSubject || exam.Subject,
+    testMark: exam.IsComposition
+        ? (exam.Mark5 === 5 ? 'зачёт' : 'незачёт') : exam.TestMark,
+    ...(exam.IsComposition ? {}
+        : {minMark: exam.IsBasicMath ? cond.basicMath.minMark : exam.MinMark}),
+    status: exam.HasResult
+        ? (exam.IsComposition
+            ? (exam.Mark5 === 5 ? '«Зачёт»' : 'Нет результата со значением «зачёт»')
+            : (exam.IsHidden ? 'Результат скрыт' : 'Экзамен обработан'))
+        : 'Нет результата',
+    result: `http://check.ege.edu.ru/exams/${exam.ExamId}`,
+});
 
-    let strs = [];
-    for (let i in obj)
-        if (obj.hasOwnProperty(i))
-            if (obj[i].toString().match(/^https?:\/\//))
-                strs.push(`  ${locale[i]}: ${obj[i]}`);
-            else
-                strs.push(`  ${locale[i]}: \`${obj[i]}\``);
-    strs[0] = strs[0].replace(/^\s(\s+[^\s])/, '-$1');
-    return strs.join('\n');
+function formatExam(exam) {
+    return [
+        `\`${exam.id}\`. \`${exam.subject}\` (\`${exam.date}\`)`,
+        exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
+        exam.minMark ? `Минимальный балл: \`${exam.minMark}\`` : null,
+        `Статус: \`${exam.status}\``,
+        exam.result ? `Проверьте: ${exam.result}` : null,
+    ].filter((s) => s !== null).join('\n');
 }
 
 module.exports.formatExams = function (exams) {
     return exams
-        .map((exam) => ({
-            date: DateUtils.dateToRuFormat(exam.ExamDate),
-            subject: exam.OralSubject || exam.Subject,
-            testMark: exam.IsComposition
-                ? (exam.Mark5 === 5 ? 'зачёт' : 'незачёт') : exam.TestMark,
-            ...(exam.IsComposition ? {}
-                : {minMark: exam.IsBasicMath ? cond.basicMath.minMark : exam.MinMark}),
-            status: exam.HasResult
-                ? (exam.IsComposition
-                    ? (exam.Mark5 === 5 ? '«Зачёт»' : 'Нет результата со значением «зачёт»')
-                    : (exam.IsHidden ? 'Результат скрыт' : 'Экзамен обработан'))
-                : 'Нет результата',
-            result: `http://check.ege.edu.ru/exams/${exam.ExamId}`
-        }))
-        .map(formatObject).join('\n\n')
+        .map(mapExam)
+        .map(formatExam).join('\n\n')
 };
