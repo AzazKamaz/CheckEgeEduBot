@@ -97,21 +97,21 @@ const checkExam = async (ctx) => {
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             else {
                 const timeout = reqTimeout(5000);
-                ctx.wizard.state.user.hasResults = await Promise.all(data.Result.Exams
-                    .map((exam) => (ctx.wizard.state.user.hasResults || {})[exam.ExamId]
-                        ? exam.ExamId : fetch(`http://check.ege.edu.ru/api/exam/${exam.ExamId}`, {
-                            ...timeout.param,
-                            headers: {
-                                cookie: ctx.wizard.state.user.cookie
-                            }
-                        }).then(({ok}) => ok ? exam.ExamId : null).catch(() => null)))
-                    .then((has) => has.reduce((has, id) => id !== null ? {...has, [id]: true} : has, {}))
-                    .finally(() => clearTimeout(timeout.timeout));
+                // ctx.wizard.state.user.hasResults = await Promise.all(data.Result.Exams
+                //     .map((exam) => (ctx.wizard.state.user.hasResults || {})[exam.ExamId]
+                //         ? exam.ExamId : fetch(`http://check.ege.edu.ru/api/exam/${exam.ExamId}`, {
+                //             ...timeout.param,
+                //             headers: {
+                //                 cookie: ctx.wizard.state.user.cookie
+                //             }
+                //         }).then(({ok}) => ok ? exam.ExamId : null).catch(() => null)))
+                //     .then((has) => has.reduce((has, id) => id !== null ? {...has, [id]: true} : has, {}))
+                //     .finally(() => clearTimeout(timeout.timeout));
 
                 ctx.replyWithMarkdown(header
                     + formatExams(data.Result.Exams.map((exam) => ({
                         ...exam,
-                        _HasResult: ctx.wizard.state.user.hasResults[exam.ExamId]
+                        _HasResult: (ctx.wizard.state.user.hasResults | {})[exam.ExamId]
                     })))
                     + '\n\n\\* Результаты откроются после входа на http://check.ege.edu.ru',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
