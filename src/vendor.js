@@ -448,7 +448,10 @@ module.exports.DateUtils = function() {
     var dateToRuFormat = function(date) {
         var dateRegex = /^(\d\d\d\d)\-(\d\d)\-(\d\d)/;
         var match = dateRegex.exec(date);
-        return [match[3], match[2], match[1]].join('.');
+        return [
+            match[3], match[2],
+            ...(Number(match[1]) !== new Date().getFullYear() ? [match[1]] : []), // PATCHED
+        ].join('.');
     };
 
     var dateTimeToRuDateFormat = function(date) {
