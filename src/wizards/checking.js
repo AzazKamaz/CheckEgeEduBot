@@ -83,7 +83,7 @@ const checkExam = async (ctx) => {
                     header + '```\n' + yaml.safeDump(data) + '\n```',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             else {
-                const timeout = reqTimeout(5000);
+                // const timeout = reqTimeout(5000);
                 // ctx.wizard.state.user.hasResults = await Promise.all(data.Result.Exams
                 //     .map((exam) => (ctx.wizard.state.user.hasResults || {})[exam.ExamId]
                 //         ? exam.ExamId : fetch(`http://check.ege.edu.ru/api/exam/${exam.ExamId}`, {
