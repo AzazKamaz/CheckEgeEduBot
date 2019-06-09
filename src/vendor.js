@@ -440,12 +440,12 @@ module.exports.cond = {
     }
 };
 
-module.exports.DateUtils = function() {
-    var f = function(num) {
+module.exports.DateUtils = function () {
+    var f = function (num) {
         return num < 10 ? '0' + num : num;
     };
 
-    var dateToRuFormat = function(date) {
+    var dateToRuFormat = function (date) {
         var dateRegex = /^(\d\d\d\d)\-(\d\d)\-(\d\d)/;
         var match = dateRegex.exec(date);
         return [
@@ -454,12 +454,12 @@ module.exports.DateUtils = function() {
         ].join('.');
     };
 
-    var dateTimeToRuDateFormat = function(date) {
+    var dateTimeToRuDateFormat = function (date) {
         date = new Date(date);
         return [f(date.getDate()), f(date.getMonth() + 1), date.getFullYear()].join('.');
     };
 
-    var dateTimeToRuFormat = function(date) {
+    var dateTimeToRuFormat = function (date) {
         date = new Date(date);
         return [f(date.getDate()), f(date.getMonth() + 1), date.getFullYear()].join('.') + ' ' +
             [f(date.getHours()), f(date.getMinutes()), f(date.getSeconds())].join(':');
