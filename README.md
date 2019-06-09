@@ -13,5 +13,5 @@ Variable          | Description
 `$REDISCLOUD_URL` | Url for redis connection (addon Redis Cloud on Heroku)
 `$TG_TOKEN`       | Telegram bot token from t.me/BotFather
 `$WEBHOOK_DOMAIN` | [optional] Domain on which webhook is served
-`$WEBHOOK_PATH`   | [optional] Path on whick webhook is served (default is `/[uuid4]`)
+`$WEBHOOK_PATH`   | [optional] Path on which webhook is served (default is `/[uuid4]`)
 `$PORT`           | [optional] Port on which handle webhook (set by Heroku, default is `8000`)
