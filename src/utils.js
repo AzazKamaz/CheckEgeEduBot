@@ -62,10 +62,8 @@ function formatExam(exam) {
         `\`${exam.id}\`. \`${exam.subject}\` (\`${exam.date}\`)`,
         exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
         exam.minMark ? `Минимальный балл: \`${exam.minMark}\`` : null,
-        `Статус: \`${exam.status}\``,
-        exam.resultLink ? `\\*Проверьте: ${exam.resultLink}` : null,
-        exam.appeal ? `Апелляция: \`${exam.appeal}\`` : null,
-        exam.appealLink ? `\\*Апелляция: ${exam.appealLink}` : null,
+        `Статус: [${exam.status}](${exam.resultLink})`,
+        exam.appeal ? `Апелляция: [${exam.appeal}](${exam.appealLink})` : null,
     ].filter((s) => s !== null).join('\n');
 }
 
