@@ -62,6 +62,11 @@ module.exports = class CheckBot extends Telegraf {
     }
 
     mount() {
+        this.action(/.+/, (ctx, next) => {
+            ctx.answerCbQuery();
+            next();
+        });
+
         const stage = new Stage([addingWizard, checkingWizard]);
         stage.command(['start', 'menu'], async (ctx, next) => {
             await ctx.scene.leave();
