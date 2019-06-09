@@ -63,6 +63,10 @@ module.exports = class CheckBot extends Telegraf {
 
     mount() {
         const stage = new Stage([addingWizard, checkingWizard]);
+        stage.command(['start', 'menu'], async (ctx, next) => {
+            await ctx.scene.leave();
+            return await next();
+        });
         this.use(stage.middleware());
 
         // Any input in "forms" (like name, document number and region) are processed above, in stage.
