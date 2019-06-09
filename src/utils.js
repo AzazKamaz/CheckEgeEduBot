@@ -6,7 +6,7 @@ const Markup = require('telegraf/markup');
 const emoji = require('node-emoji');
 const AbortController = require('abort-controller');
 
-const {DateUtils, Appeal} = require('./vendor');
+const {DateUtils, Appeal, cond} = require('./vendor');
 
 module.exports.mainMenu = function (session, participants = session.participants) {
     return [...
@@ -55,6 +55,10 @@ const mapExam = (exam) => ({
         }),
     ...(!exam._HasResult ? {}
         : {resultLink: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
+    emoji: exam.HasResult
+        ? ((exam.IsComposition ? exam.Mark5 === cond.composition.minMark : exam.TestMark >= exam.MinMark)
+            ? emoji.get('white_check_mark') : emoji.get('x'))
+        : emoji.get('clock5')
 });
 
 function formatExam(exam) {
@@ -62,7 +66,7 @@ function formatExam(exam) {
         `\`${exam.id}\`. \`${exam.subject}\` (\`${exam.date}\`)`,
         exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
         exam.testMark && Number(exam.testMark) < Number(exam.minMark) ? `Минимальный балл: \`${exam.minMark}\`` : null,
-        `Статус: [${exam.status}](${exam.resultLink})`,
+        `Статус: [${exam.emoji}${exam.status}](${exam.resultLink})`,
         exam.appeal ? `Апелляция: [${exam.appeal}](${exam.appealLink})` : null,
     ].filter((s) => s !== null).join('\n');
 }
