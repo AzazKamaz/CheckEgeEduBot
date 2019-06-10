@@ -29,7 +29,7 @@ const refreshCaptcha = async (ctx) => {
             }, Markup.inlineKeyboard([
                 Markup.callbackButton('Обновить', 'refresh'),
                 Markup.callbackButton('Отмена', 'cancel'),
-            ]).extra());
+            ]).extra({caption: 'Внимание! Сайт ЕГЭ обновил капчу, вероятно, вы получите ошибку.\n\nМы уже ищем пути решения!'}));
         }).catch((err) => {
             if (err.name === 'AbortError')
                 ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
