@@ -187,9 +187,13 @@ module.exports.checkingWizard = new WizardScene('checking-wizard', {},
             return ctx.scene.leave();
         }),
         Composer.mount('text', async (ctx) => {
-            let text = ctx.message.text.replace(/[^\d]/g, '');
+            let text = ctx.message.text;
             if (text.length) {
-                ctx.wizard.state.captcha = text;
+                if (text.match(/Participant=.+/)) {
+                    ctx.wizard.state.user.cookie = text;
+                    ctx.session.participants[ctx.wizard.state.user.id] = ctx.wizard.state.user;
+                } else
+                    ctx.wizard.state.captcha = text;
                 await login(ctx);
             }
         }),
