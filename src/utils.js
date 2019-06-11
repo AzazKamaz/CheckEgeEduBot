@@ -55,7 +55,7 @@ const mapExam = (exam) => ({
         }),
     ...(!exam._HasResult ? {}
         : {resultLink: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
-    emoji: (exam.HasResult && (exam.Mark5 || exam.TestMark || !exam.IsHidden)
+    emoji: (exam.HasResult && (exam.Mark5 || exam.TestMark || !exam.IsHidden))
         ? ((exam.IsComposition ? exam.Mark5 === cond.composition.minMark : exam.TestMark >= exam.MinMark)
             ? emoji.get('white_check_mark') : emoji.get('x'))
         : emoji.get('clock5')
