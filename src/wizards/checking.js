@@ -100,8 +100,7 @@ const checkExam = async (ctx) => {
                         ...exam,
                         _HasResult: true //(ctx.wizard.state.user.hasResults | {})[exam.ExamId]
                     })))
-                    + '\n\n\\* Ссылка откроется после входа на http://check.ege.edu.ru'
-                    + '\n  ! На ней результат может появиться на день раньше (к сожалению, мы не можем это проверить :( )',
+                    + '\n\n\\* Ссылка откроется после входа на [check.ege.edu.ru](http://check.ege.edu.ru)',
                     Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
             }
 
