@@ -55,7 +55,7 @@ const mapExam = (exam) => ({
         }),
     ...(!exam._HasResult ? {}
         : {resultLink: `http://check.ege.edu.ru/exams/${exam.ExamId}`}),
-    emoji: exam.HasResult
+    emoji: (exam.HasResult && (exam.Mark5 || exam.TestMark || !exam.IsHidden)
         ? ((exam.IsComposition ? exam.Mark5 === cond.composition.minMark : exam.TestMark >= exam.MinMark)
             ? emoji.get('white_check_mark') : emoji.get('x'))
         : emoji.get('clock5')
@@ -64,7 +64,7 @@ const mapExam = (exam) => ({
 function formatExam(exam) {
     return [
         `\`${exam.id}\`. \`${exam.subject}\` (\`${exam.date}\`)`,
-        exam.testMark ? `Тестовый балл: \`${exam.testMark}\`` : null,
+        (exam.testMark || !exam.IsHidden) ? `Тестовый балл: \`${exam.testMark}\`` : null,
         exam.testMark && Number(exam.testMark) < Number(exam.minMark) ? `Минимальный балл: \`${exam.minMark}\`` : null,
         `Статус: ${exam.emoji} [${exam.status}](${exam.resultLink})`,
         exam.appeal ? `Апелляция: [${exam.appeal}](${exam.appealLink})` : null,
