@@ -31,7 +31,7 @@ const refreshCaptcha = async (ctx) => {
                 Markup.callbackButton('Отмена', 'cancel'),
             ]).extra({caption: 'Внимание! Сайт ЕГЭ обновил капчу, вероятно, вы получите ошибку.\n\nМы уже ищем пути решения!'}));
         }).catch((err) => {
-            if (err.name === 'AbortError')
+            if (err.name === 'AbortError' || err.name === 'invalid-json')
                 ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
                     Markup.inlineKeyboard([
                         Markup.callbackButton('Повторить', 'refresh'),
@@ -106,7 +106,7 @@ const checkExam = async (ctx) => {
 
             return await ctx.scene.leave();
         }).catch((err) => {
-            if (err.name === 'AbortError')
+            if (err.name === 'AbortError' || err.name === 'invalid-json')
                 ctx.replyWithMarkdown('`check.ege.edu.ru` не отвечает :(',
                     Markup.inlineKeyboard([
                         Markup.callbackButton('Повторить', 'check'),
