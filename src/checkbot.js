@@ -7,11 +7,20 @@ const Markup = require('telegraf/markup');
 const Extra = require('telegraf/extra');
 
 const Keyv = require('keyv');
+const Intl = require("intl");
 
 const {checkExam} = require('./examapi');
 const locale = require('./locale');
 
 const examMarkup = data => Markup.inlineKeyboard([Markup.callbackButton(locale.updateBtn, data)]);
+
+const ruDate = new Intl.DateTimeFormat('ru-RU', {
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    timeZone: 'Europe/Moscow',
+});
 
 module.exports = class CheckBot extends Telegraf {
     constructor() {
@@ -63,12 +72,7 @@ module.exports = class CheckBot extends Telegraf {
 
                 const cookie = await this.keyv.get(cbdata.key);
 
-                const date = new Date().toLocaleString('ru-RU', {
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                });
+                const date = ruDate.format(new Date());
 
                 const text = locale.examMsg(date, await checkExam(cookie));
 

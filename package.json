@@ -9,6 +9,7 @@
   "dependencies": {
     "@keyv/redis": "^2.1.2",
     "abort-controller": "^3.0.0",
+    "intl": "^1.2.5",
     "js-yaml": "^3.14.0",
     "keyv": "^4.0.1",
     "node-emoji": "^1.10.0",
