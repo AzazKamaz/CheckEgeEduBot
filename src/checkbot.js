@@ -19,7 +19,6 @@ const ruDate = new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
-    timeZone: 'Europe/Moscow',
 });
 
 module.exports = class CheckBot extends Telegraf {
