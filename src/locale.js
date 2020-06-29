@@ -11,5 +11,5 @@ module.exports = {
     nextYear: 'Результаты, полученные ранее 1 сентября, заморожены',
     updateBtn: 'Обновить',
     error: e => `Error: ${e}`,
-    examMsg: (t, ex) => `Проверка от ${t}\n\n${ex}`
+    examMsg: (t, ex) => `Проверка от ${t}\n\n${ex} utc`
 };
