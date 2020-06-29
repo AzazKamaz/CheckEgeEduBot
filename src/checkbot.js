@@ -43,12 +43,17 @@ module.exports = class CheckBot extends Telegraf {
         this.command("/cookie", async ctx => {
             const cookie = (ctx.message.text.match(/(^|\s)Participant=([0-9A-F]{200})(\s|$)/) || [])[2];
             if (!cookie)
-                return ctx.reply(locale.cookieCmd, Extra.markdown(true));
+                return await ctx.reply(locale.cookieCmd, Extra.markdown(true));
 
             const key = `${ctx.message.chat.id}:${ctx.message.message_id}`;
             const cbdata = {key, time: 0};
             await this.keyv.set(key, cookie);
-            return ctx.reply(locale.initRes, Extra.inReplyTo(ctx.message.message_id).markup(examMarkup(JSON.stringify(cbdata))));
+            await ctx.reply(locale.initRes, Extra.inReplyTo(ctx.message.message_id).markup(examMarkup(JSON.stringify(cbdata))));
+        });
+
+        this.on('callback_query', async (ctx, next) => {
+            if (Date.UTC(2020, 5, 29) < Date.now()) await next();
+            else await ctx.answerCbQuery(locale.unsupportedMsg, true);
         });
 
         this.on('callback_query', async (ctx, next) => {
@@ -60,7 +65,7 @@ module.exports = class CheckBot extends Telegraf {
                 await ctx.editMessageReplyMarkup();
                 await ctx.answerCbQuery(locale.nextYear, true);
             } else
-                return next();
+                await next();
         });
 
         this.on('callback_query', async ctx => {

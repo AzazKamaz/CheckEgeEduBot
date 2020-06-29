@@ -11,5 +11,6 @@ module.exports = {
     nextYear: 'Результаты, полученные ранее 1 сентября, заморожены',
     updateBtn: 'Обновить',
     error: e => `Error: ${e}`,
-    examMsg: (t, ex) => `Проверка от ${t} utc\n\n${ex}`
+    examMsg: (t, ex) => `Проверка от ${t} utc\n\n${ex}`,
+    unsupportedMsg: 'Бот был обновлен, данное сообщение более не поддерживается. Начните с /start',
 };
