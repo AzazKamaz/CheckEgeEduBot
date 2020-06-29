@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 const CheckBot = require('./checkbot');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 
 const bot = new CheckBot(process.env.TG_TOKEN, {telegram: {webhookReply: true}});
 
