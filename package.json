@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "license": "MIT",
   "dependencies": {
-    "@keyv/postgres": "^1.0.16",
+    "@keyv/redis": "^2.1.2",
     "abort-controller": "^3.0.0",
     "js-yaml": "^3.14.0",
     "keyv": "^4.0.1",
