@@ -8,10 +8,8 @@ For running you need some env variables:
 
 Variable          | Description
 --------          | -----------
-`$DB_TYPE`        | `lowdb` \| `sqlite` \| `redis`
-`$DB_FILE`        | File where to store DB (default is `/storage/db.[ext]`)
-`$REDISCLOUD_URL` | Url for redis connection (addon Redis Cloud on Heroku)
 `$TG_TOKEN`       | Telegram bot token from t.me/BotFather
 `$WEBHOOK_DOMAIN` | [optional] Domain on which webhook is served
 `$WEBHOOK_PATH`   | [optional] Path on which webhook is served (default is `/[uuid4]`)
 `$PORT`           | [optional] Port on which handle webhook (set by Heroku, default is `8000`)
+`$REDISCLOUD_URL` | [optional] Url for redis connection (addon Redis Cloud on Heroku)

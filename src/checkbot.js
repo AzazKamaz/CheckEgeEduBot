@@ -3,157 +3,79 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 const Telegraf = require('telegraf');
-const Stage = require('telegraf/stage');
 const Markup = require('telegraf/markup');
+const Extra = require('telegraf/extra');
 
-const fs = require('fs');
-const uuid = require('uuid/v4');
-const sqlite3 = require('sqlite3').verbose();
-const session = require('telegraf-session-sqlite');
-const LocalSession = require('telegraf-session-local');
-const RedisSession = require('telegraf-session-redis');
+const Keyv = require('keyv');
 
-const {mainMenu} = require('./utils');
-const {addingWizard} = require('./wizards/adding');
-const {checkingWizard} = require('./wizards/checking');
+const {checkExam} = require('./examapi');
+const locale = require('./locale');
+
+const examMarkup = data => Markup.inlineKeyboard([Markup.callbackButton(locale.updateBtn, data)]);
 
 module.exports = class CheckBot extends Telegraf {
     constructor() {
         super(...arguments);
 
-        if (!fs.existsSync('storage')) {
-            fs.mkdirSync('storage');
-        }
+        // Use redis connection or in-memory storage
+        this.keyv = new Keyv(process.env.REDISCLOUD_URL || '');
 
-        const file = process.env.DB_FILE;
-        if (process.env.DB_TYPE === 'lowdb')
-            this.use(new LocalSession({database: file || './storage/db.json'}).middleware());
-        else if (process.env.DB_TYPE === 'sqlite') {
-            this.db = new sqlite3.Database(file || './storage/db.sqlite3');
-
-            this.db.serialize(() => {
-                this.db.run('CREATE TABLE IF NOT EXISTS user_session' +
-                    '(id TEXT primary key, session TEXT);');
-            });
-
-            this.use(session({
-                db: this.db,
-                table_name: 'user_session'
-            }));
-        } else if (process.env.DB_TYPE === 'redis') {
-            // Heroku Redis Cloud addon
-            const redisUrl = process.env.REDISCLOUD_URL;
-            this.use(new RedisSession({store: {url: redisUrl}}));
-        } else {
-            this.db = new sqlite3.Database(':memory:');
-
-            this.db.serialize(() => {
-                this.db.run('CREATE TABLE IF NOT EXISTS user_session' +
-                    '(id TEXT primary key, session TEXT);');
-            });
-
-            this.use(session({
-                db: this.db,
-                table_name: 'user_session'
-            }));
-        }
-
-        this.mount()
+        this.catch((e) => {
+            console.log(e);
+        });
+        this.mount();
     }
 
     mount() {
-        this.action(/.+/, (ctx, next) => {
-            ctx.answerCbQuery();
-            return next();
+        this.start((ctx) => ctx.reply(locale.start, Extra.markdown(true)));
+        this.help((ctx) => ctx.reply(locale.help, Extra.markdown(true)));
+
+        this.command("/cookie", async ctx => {
+            const cookie = (ctx.message.text.match(/(^|\s)Participant=([0-9A-F]{200})(\s|$)/) || [])[2];
+            if (!cookie)
+                return ctx.reply(locale.cookieCmd, Extra.markdown(true));
+
+            const key = `${ctx.message.chat.id}:${ctx.message.message_id}`;
+            const cbdata = {key, time: 0};
+            await this.keyv.set(key, cookie);
+            return ctx.reply(locale.initRes, Extra.inReplyTo(ctx.message.message_id).markup(examMarkup(JSON.stringify(cbdata))));
         });
 
-        const stage = new Stage([addingWizard, checkingWizard]);
-        stage.command(['start', 'menu'], async (ctx, next) => {
-            await ctx.scene.leave();
-            return await next();
-        });
-        this.use(stage.middleware());
-
-        // Any input in "forms" (like name, document number and region) are processed above, in stage.
-        // So this middleware will print only /start command and text out of system
-        // This is a some kind of analytics, don't worry about it :)
-        this.use((ctx, next) => {
-            if (ctx.update && ctx.update.message)
-                console.log(`@${ctx.update.message.from.username}: ${ctx.update.message.text}`);
-            return next();
+        this.on('callback_query', async (ctx, next) => {
+            const date = new Date(ctx.update.callback_query.message.date * 1e3);
+            const now = new Date();
+            const sepA = new Date(now.getFullYear() - 1, 8);
+            const sepB = new Date(now.getFullYear(), 8);
+            if ((date < sepA && sepA <= now) || (date < sepB && sepB <= now)) {
+                await ctx.editMessageReplyMarkup();
+                await ctx.answerCbQuery(locale.nextYear, true);
+            } else
+                return next();
         });
 
-        this.action('add', (ctx) => ctx.scene.enter('adding-wizard'));
+        this.on('callback_query', async ctx => {
+            try {
+                const cbdata = JSON.parse(ctx.update.callback_query.data);
 
-        this.action(/check\s(\d+)/, (ctx) => ctx.scene.enter('checking-wizard'));
+                if (Date.now() - cbdata.time < 15 * 1e3)
+                    return await ctx.answerCbQuery(locale.cooldown);
+                cbdata.time = Date.now();
 
-        this.action(/del\s(\d+)/, (ctx) => {
-            delete (ctx.session.participants || {})[ctx.match[1]];
-            ctx.reply('Участник ЕГЭ удален', Markup.inlineKeyboard(mainMenu(ctx.session)).extra());
-        });
+                const cookie = await this.keyv.get(cbdata.key);
 
-        this.action('raw', (ctx) => {
-            ctx.session.raw = true;
-            ctx.replyWithMarkdown(
-                'Режим экспертного вывода включен, вы будете получать ровно то, что прислал \`check.ege.edu.ru\`',
-                Markup.inlineKeyboard(mainMenu(ctx.session)).extra())
-        });
-
-        this.action('beauty', (ctx) => {
-            ctx.session.raw = false;
-            ctx.replyWithMarkdown(
-                'Режим красивого вывода включен, вы будете получать красивый список с результатами',
-                Markup.inlineKeyboard(mainMenu(ctx.session)).extra())
-        });
-
-        this.use((ctx) =>
-            ctx.reply('Выберите любую опцию', Markup.inlineKeyboard(mainMenu(ctx.session)).extra())
-        );
-    }
-
-    launch(options) {
-        const domain = process.env.WEBHOOK_DOMAIN;
-        const port = process.env.PORT || 8000;
-        if (domain) {
-            this.telegram
-                .deleteWebhook()
-                .then(async () => {
-                    const secretPath = process.env.WEBHOOK_PATH || uuid();
-                    this.startWebhook(`/${secretPath}`, undefined, port);
-                    await this.telegram.setWebhook(
-                        `https://${domain}/${secretPath}`,
-                        undefined,
-                        100
-                    );
-                    const webhookInfo = await this.telegram.getWebhookInfo();
-                    console.info('Bot is up and running with webhooks', webhookInfo);
-                })
-                .catch(err => console.info('Bot launch error', err));
-        } else {
-            this.telegram
-                .deleteWebhook()
-                .then(async () => {
-                    this.startPolling();
-                    // Console that everything is fine
-                    console.info('Bot is up and running');
-                })
-                .catch(err => console.info('Bot launch error', err));
-        }
-    }
-
-    stop(cb) {
-        console.log('Stopping telegraf...');
-        super.stop(() => {
-            console.log('Telegraf stopped.');
-
-            if (this.db) {
-                console.log('Closing sqlite3...');
-                this.db.close(() => {
-                    console.log('Sqlite3 closed.');
-
-                    cb();
+                const date = new Date().toLocaleString('ru', {
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
                 });
-            } else cb();
+
+                const text = locale.examMsg(date, await checkExam(cookie));
+
+                await ctx.editMessageText(text, Extra.markdown().markup(examMarkup(JSON.stringify(cbdata))));
+            } catch (e) {
+                await ctx.answerCbQuery(locale.error(e.message), true);
+            }
         });
     }
 };
