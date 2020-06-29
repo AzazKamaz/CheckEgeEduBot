@@ -63,7 +63,7 @@ module.exports = class CheckBot extends Telegraf {
 
                 const cookie = await this.keyv.get(cbdata.key);
 
-                const date = new Date().toLocaleString('ru', {
+                const date = new Date().toLocaleString('ru-RU', {
                     month: 'numeric',
                     day: 'numeric',
                     hour: 'numeric',
