@@ -52,7 +52,7 @@ module.exports = class CheckBot extends Telegraf {
         });
 
         this.on('callback_query', async (ctx, next) => {
-            if (Date.UTC(2020, 5, 29) < Date.now()) await next();
+            if (Date.UTC(2020, 5, 29) < ctx.update.callback_query.message.date * 1e3) await next();
             else await ctx.answerCbQuery(locale.unsupportedMsg, true);
         });
 
