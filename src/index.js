@@ -12,7 +12,7 @@ if (process.env.WEBHOOK_DOMAIN)
         webhook: {
             domain: process.env.WEBHOOK_DOMAIN,
             port: process.env.PORT || 8000,
-            hookPath: process.env.WEBHOOK_PATH || uuid()
+            hookPath: process.env.WEBHOOK_PATH || `/${uuid()}`
         }
     }).then(() => console.log('Bot is up and running with webhook'));
 else
