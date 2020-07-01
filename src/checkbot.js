@@ -79,6 +79,9 @@ module.exports = class CheckBot extends Telegraf {
 
             try {
                 const cookie = await this.keyv.get(cbdata.key);
+                if (cookie === undefined)
+                    throw new Error('Key not found in database');
+
                 const date = ruDate.format(new Date());
                 const text = locale.examMsg(date, await checkExam(cookie));
 
