@@ -69,24 +69,22 @@ module.exports = class CheckBot extends Telegraf {
         });
 
         this.on('callback_query', async ctx => {
+            const cbdata = {...JSON.parse(ctx.update.callback_query.data), time: Date.now()};
+
+            if (typeof (cbdata.key) != 'string' || cbdata.key.startsWith(`${ctx.update.callback_query.message.chat.id}:`))
+                return await ctx.answerCbQuery();
+
+            if (Date.now() - (ctx.update.callback_query.message.edit_date || 0) * 1e3 < 15 * 1e3)
+                return await ctx.answerCbQuery(locale.cooldown);
+
             try {
-                const cbdata = JSON.parse(ctx.update.callback_query.data);
-
-                if (typeof (cbdata.key) != 'string' || cbdata.key.startsWith(`${ctx.update.callback_query.message.chat.id}:`))
-                    return await ctx.answerCbQuery();
-
-                if (Date.now() - (ctx.update.callback_query.message.edit_date || 0) * 1e3 < 15 * 1e3)
-                    return await ctx.answerCbQuery(locale.cooldown);
-                cbdata.time = Date.now();
-
                 const cookie = await this.keyv.get(cbdata.key);
-
                 const date = ruDate.format(new Date());
-
                 const text = locale.examMsg(date, await checkExam(cookie));
 
                 await ctx.editMessageText(text, Extra.markdown().markup(examMarkup(JSON.stringify(cbdata))));
             } catch (e) {
+                await ctx.editMessageReplyMarkup(examMarkup(JSON.stringify(cbdata)));
                 await ctx.answerCbQuery(locale.error(e.message), true);
             }
         });
