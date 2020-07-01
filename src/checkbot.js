@@ -71,7 +71,7 @@ module.exports = class CheckBot extends Telegraf {
         this.on('callback_query', async ctx => {
             const cbdata = {...JSON.parse(ctx.update.callback_query.data), time: Date.now()};
 
-            if (typeof (cbdata.key) != 'string' || cbdata.key.startsWith(`${ctx.update.callback_query.message.chat.id}:`))
+            if (typeof (cbdata.key) != 'string' || !cbdata.key.startsWith(`${ctx.update.callback_query.message.chat.id}:`))
                 return await ctx.answerCbQuery();
 
             if (Date.now() - (ctx.update.callback_query.message.edit_date || 0) * 1e3 < 15 * 1e3)
