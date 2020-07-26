@@ -88,7 +88,10 @@ module.exports = class CheckBot extends Telegraf {
                 await ctx.editMessageText(text, Extra.markdown().markup(examMarkup(JSON.stringify(cbdata))));
             } catch (e) {
                 await ctx.editMessageReplyMarkup(examMarkup(JSON.stringify(cbdata)));
-                await ctx.answerCbQuery(locale.error(e.message), true);
+                if (err.name === 'AbortError' || err.name === 'invalid-json')
+                    await ctx.answerCbQuery(locale.timeout, true);
+                else
+                    await ctx.answerCbQuery(locale.error(e.message), true);
             }
         });
     }
